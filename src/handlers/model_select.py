@@ -7,7 +7,9 @@ from src.config import config
 router = Router()
 
 
-@router.callback_query(lambda c: c.data and c.data.startswith("model:"))
+@router.callback_query(
+    lambda callback: callback.data and callback.data.startswith("model:")
+)
 async def model_select(
     call: CallbackQuery,
     redis: Redis,
@@ -25,7 +27,7 @@ async def model_select(
     await redis.set(
         key,
         model,
-        ex=60 * 60 * 24 * 30,
+        ex=60 * 60 * 24 * 30,  # 30 дней
     )
 
     await call.answer(

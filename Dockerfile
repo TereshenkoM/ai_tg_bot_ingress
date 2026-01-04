@@ -39,3 +39,4 @@ RUN which python \
  && python -c "import aiogram, celery, redis, httpx; print('deps ok')"
 
 CMD ["python", "main.py"]
+    

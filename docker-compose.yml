@@ -1,4 +1,54 @@
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    hostname: zookeeper
+    container_name: zookeeper
+    networks:
+      - backend
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -lc 'echo ruok > /dev/tcp/127.0.0.1/2181'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: kafka
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    networks:
+      - backend
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 >/dev/null 2>&1" ]
+      interval: 10s
+      timeout: 8s
+      retries: 15
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
   redis:
     image: redis:7.4-alpine
     user: "999:999"
@@ -32,6 +82,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - backend
       - egress
@@ -50,16 +102,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command:
-      [
-        "python", "-m", "celery",
-        "-A", "src.adapters.celery_app:celery_app",
-        "worker", "-l", "info"
-      ]
+    command: ["python", "-m", "celery", "-A", "src.adapters.celery_app:celery_app", "worker", "-l", "info"]
     env_file:
       - .env
     depends_on:
       redis:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     networks:
       - backend
@@ -79,17 +128,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command:
-      [
-        "python", "-m", "celery",
-        "-A", "src.adapters.celery_app:celery_app",
-        "beat", "-l", "info",
-        "--schedule", "/tmp/celerybeat-schedule"
-      ]
+    command: ["python", "-m", "celery", "-A", "src.adapters.celery_app:celery_app", "beat", "-l", "info", "--schedule", "/tmp/celerybeat-schedule"]
     env_file:
       - .env
     depends_on:
       redis:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     networks:
       - backend

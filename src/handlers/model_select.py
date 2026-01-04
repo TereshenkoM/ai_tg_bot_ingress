@@ -1,8 +1,8 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery
-from redis.asyncio import Redis
 
 from src.config import config
+from src.dto import AppState
 
 router = Router()
 
@@ -12,10 +12,10 @@ router = Router()
 )
 async def model_select(
     call: CallbackQuery,
-    redis: Redis,
+    app_state: AppState,
 ):
+    redis = app_state.redis
     model = call.data.split("model:", 1)[1].strip()
-
     if not model:
         await call.answer("Некорректная модель", show_alert=False)
         return

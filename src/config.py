@@ -15,6 +15,9 @@ class Config(BaseSettings):
     MANAGEMENT_SERVICE_URL: str
     MANAGEMENT_SERVICE_MODEL_ENDPOINT: str
 
+    TOPIC_USER_MESSAGES: str
+    KAFKA_BOOTSTRAP_SERVERS: str
+
     DEFAULT_MODELS: list[str] = ["gemini", "chatgpt"]
 
     model_config = SettingsConfigDict(

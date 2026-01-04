@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.services.model_registry import ModelRegistry
+from src.dto import AppState
 
 router = Router()
 
@@ -11,9 +11,10 @@ router = Router()
 @router.message(CommandStart())
 async def start(
     message: Message,
-    model_registry: ModelRegistry,
+    app_state: AppState,
 ):
-    models = await model_registry.list_models()
+    registry = app_state.model_registry
+    models = await registry.list_models()
 
     if not models:
         await message.answer("Доступные модели отсутствуют. Попробуйте позже.")

@@ -19,7 +19,9 @@ class ModelCatalogService:
         jitter: float = 0.2,
     ) -> None:
         self.management_service_url = (
-            management_service_url if management_service_url else config.MANAGEMENT_SERVICE_URL
+            management_service_url
+            if management_service_url
+            else config.MANAGEMENT_SERVICE_URL
         )
         self.management_service_models_endpoint = (
             management_service_models_endpoint
@@ -33,7 +35,9 @@ class ModelCatalogService:
         self.jitter = jitter
 
     async def fetch_models(self) -> list[str]:
-        models_url = f"{self.management_service_url}{self.management_service_models_endpoint}"
+        models_url = (
+            f"{self.management_service_url}{self.management_service_models_endpoint}"
+        )
 
         timeout = httpx.Timeout(5.0, connect=2.0)
         async with httpx.AsyncClient(timeout=timeout) as client:
@@ -41,9 +45,15 @@ class ModelCatalogService:
             data = response.json()
 
         models = data.get("models", [])
-        return [model.strip() for model in models if isinstance(model, str) and model.strip()]
+        return [
+            model.strip()
+            for model in models
+            if isinstance(model, str) and model.strip()
+        ]
 
-    async def _get_with_retries(self, client: httpx.AsyncClient, url: str) -> httpx.response:
+    async def _get_with_retries(
+        self, client: httpx.AsyncClient, url: str
+    ) -> httpx.response:
         last_exc: Exception | None = None
 
         for attempt, delay in self._attempts_with_delays():

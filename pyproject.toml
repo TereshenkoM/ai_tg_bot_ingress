@@ -7,6 +7,7 @@ dependencies = [
     "aiogram>=3.24.0",
     "aiokafka>=0.13.0",
     "celery>=5.6.1",
+    "company-logger",
     "google-genai>=1.56.0",
     "httpx>=0.28.1",
     "pydantic-settings>=2.12.0",
@@ -71,3 +72,6 @@ line-ending = "auto"
 docstring-code-format = false
 
 docstring-code-line-length = "dynamic"
+
+[tool.uv.sources]
+company-logger = { git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git", rev = "main" }

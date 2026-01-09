@@ -1,6 +1,6 @@
 import asyncio
-import logging
-import sys
+
+from logger import setup_logging, get_logger
 
 from aiogram import Bot, Dispatcher
 
@@ -11,6 +11,8 @@ from src.dto import AppState
 from src.router_registry import setup_routers
 from src.services.model_registry import ModelRegistry
 
+setup_logging(service_name="ingress")
+logger = get_logger(__name__)
 
 async def main() -> None:
     bot = Bot(token=config.TG_BOT_TOKEN)
@@ -38,5 +40,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())

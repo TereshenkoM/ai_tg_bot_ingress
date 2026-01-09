@@ -76,6 +76,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      ssh:
+        - default
     command: ["python", "main.py"]
     env_file:
       - .env
@@ -102,6 +104,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      ssh:
+        - default
     command: ["python", "-m", "celery", "-A", "src.adapters.celery_app:celery_app", "worker", "-l", "info"]
     env_file:
       - .env
@@ -124,10 +128,13 @@ services:
     init: true
     pids_limit: 300
 
+
   celery-beat:
     build:
       context: .
       dockerfile: Dockerfile
+      ssh:
+        - default
     command: ["python", "-m", "celery", "-A", "src.adapters.celery_app:celery_app", "beat", "-l", "info", "--schedule", "/tmp/celerybeat-schedule"]
     env_file:
       - .env

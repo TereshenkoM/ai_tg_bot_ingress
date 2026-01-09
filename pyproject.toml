@@ -74,4 +74,4 @@ docstring-code-format = false
 docstring-code-line-length = "dynamic"
 
 [tool.uv.sources]
-company-logger = { git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git", rev = "main" }
+company-logger = { git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git", rev = "v0.1.0" }

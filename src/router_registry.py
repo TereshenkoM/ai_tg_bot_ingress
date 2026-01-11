@@ -8,4 +8,5 @@ def setup_routers() -> Router:
     router.include_router(start.router)
     router.include_router(model_select.router)
     router.include_router(message.router)
+
     return router

@@ -1,15 +1,9 @@
 import json
-from dataclasses import dataclass
 from typing import Any
 
 from aiokafka import AIOKafkaProducer
 
-
-@dataclass(slots=True, frozen=True)
-class KafkaProducerConfig:
-    bootstrap_servers: str
-    linger_ms: int = 5
-    acks: str = "all"
+from src.config import KafkaProducerConfig
 
 
 class KafkaProducer:

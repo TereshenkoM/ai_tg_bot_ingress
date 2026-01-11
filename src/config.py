@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,12 +19,29 @@ class Config(BaseSettings):
 
     TOPIC_USER_MESSAGES: str
     KAFKA_BOOTSTRAP_SERVERS: str
+    TOPIC_MODEL_RESPONSES: str
+    KAFKA_GROUP_ID: str
 
     DEFAULT_MODELS: list[str] = ["gemini", "chatgpt"]
 
     model_config = SettingsConfigDict(
         extra="ignore", env_file=".env", env_file_encoding="utf-8"
     )
+
+
+@dataclass(frozen=True, slots=True)
+class KafkaConsumerConfig:
+    bootstrap_servers: str
+    group_id: str
+    auto_offset_reset: str = "latest"
+    enable_auto_commit: bool = True
+
+
+@dataclass(slots=True, frozen=True)
+class KafkaProducerConfig:
+    bootstrap_servers: str
+    linger_ms: int = 5
+    acks: str = "all"
 
 
 config = Config()
